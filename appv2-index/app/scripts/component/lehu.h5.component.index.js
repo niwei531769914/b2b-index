@@ -35,13 +35,8 @@ define('lehu.h5.component.index', [
                 if (host.indexOf("http://") == -1) {
                     host = "http://" + host;
                 }
-
                 this.URL = host + "/hht/static/wap/";
                 this.LURL = host + "/hht/mobile/";
-
-                this.userId = busizutil.getUserId();
-
-                store.set('user', this.userId)
             },
 
             sendRequests: function(){
@@ -64,19 +59,7 @@ define('lehu.h5.component.index', [
 
                 api.sendRequest()
                     .done(function(data){
-                        var IMGURL;
 
-                        //如果userId存在，则对URL进行Id拼接
-                     //   if(that.userId){
-
-                       //     IMGURL = that.URL + "detail.html?userid=" + that.userId + "&id=";
-
-                      //  }
-                      //  else {
-
-                            IMGURL = that.URL + "detail.html?id=";
-
-                      //  }
                         var GOODS = data.result;
                         var bannerList = GOODS.banner;
                         var html_01 = "";
@@ -120,7 +103,20 @@ define('lehu.h5.component.index', [
                             for (var h = 0; h < goodsList.length; h++)
                             {
                                
-                                html_02 += " <a href='" + IMGURL + goodsList[h].linkUrl + "' class='swiper-slide prommotionLayout_detail'><img class='lazyload' src='" + goodsList[h].picUrl + "'></a>"
+                                html_02 += " <a href='";
+
+                                if( goodsList[h].linkUrl.indexOf("http://") > 0 ){
+
+                                    html_02 += goodsList[h].linkUrl;
+                                    console.log(1);
+                                }
+                                else {
+
+                                    html_02 += that.URL + "detail.html?id=" + goodsList[h].linkUrl;
+                                    console.log(12);
+                                }
+
+                                html_02 += "' class='swiper-slide prommotionLayout_detail'><img class='lazyload' src='" + goodsList[h].picUrl + "'></a>"
 
                             }
 
@@ -173,19 +169,20 @@ define('lehu.h5.component.index', [
 
                 var that = this;
 
-                var BANNERURL;
-                //如果userId存在，则对URL进行Id拼接
-                if(that.userId){
+                var SORT = $(element).attr("data-origin");
 
-                    BANNERURL = that.URL + "detail.html?userid=" + that.userId + "&id=";
+                //判断SORT是完整链接或goodsId
+                if( SORT.indexOf("http://") > 0 ){
+
+                    window.location.href = SORT;
+                    console.log(1);
                 }
                 else {
 
-                    BANNERURL = that.URL + "detail.html?id=";
+                    window.location.href = that.URL + "detail.html?id=" + SORT;
+                    console.log(2);
                 }
-                var SORT = $(element).attr("data-origin");
 
-                window.location.href = BANNERURL + SORT;
             },
 
             //商品页更多跳转

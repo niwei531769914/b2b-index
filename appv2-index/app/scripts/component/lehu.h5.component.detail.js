@@ -163,7 +163,7 @@ define('lehu.h5.component.detail', [
                                 var GOODSSALE;
                                 var PRICELE = String(goodsList.salePriceTwo).split(',');
 
-                                if( parseInt(PRICELE[0]) == parseInt(PRICELE[1])){
+                                if( parseFloat(PRICELE[0]) == parseFloat(PRICELE[1])){
                                     GOODSSALE = PRICELE[0];
                                 }else {
                                     GOODSSALE = goodsList.salePriceTwo.replace(/,/g, "-");
@@ -178,7 +178,7 @@ define('lehu.h5.component.detail', [
                         $('.npost_price').empty().append(goodsPrice);
                         $('.goods_jiage').empty().append(goodsSale);
 
-                        //购物车弹出层中的商品介绍和商品库存
+                        //进货单弹出层中的商品介绍和商品库存
 
                         var goodsIntroduction = "";
                         goodsIntroduction += "<span class='goods_introduction_ph'><img src=' " + goodsList.picUrl +" '></span><span class='goods_introduction_title'><em class='introduction_title_tp'>" + goodsList.name + "</em></span><span class='goods_introduction_close'></span>";
@@ -411,7 +411,7 @@ define('lehu.h5.component.detail', [
 
             //规格页面的隐藏与显示
             '.npost_fications click':function(element,event){
-
+                $('.gouwu').show();
             },
 
             '.goods_introduction_close click':function(){
@@ -525,9 +525,6 @@ define('lehu.h5.component.detail', [
 
                          //库存
                         $(".number_btn_cukun em").html(data.kucun);
-
-                        //var SALEPRICE = parseFloat(data.salePrice);
-                       // var OLDPRICE = parseFloat(data.oldPrice);
 
                         if(that.PRICEWAY == "0"){
 
@@ -658,18 +655,6 @@ define('lehu.h5.component.detail', [
                 }
             },
 
-            //分享入口
-            //'.share click': function() {
-            //
-            //    var param = can.deparam(window.location.search.substr(1));
-            //    var Href = window.location.href;
-            //
-            //    var jsonParams = {
-            //
-            //    }
-            //    LHHybrid.nativeFun(jsonParams);
-            //},
-
             //客服
             '.npost_foot_kefu click': function() {
 
@@ -706,35 +691,12 @@ define('lehu.h5.component.detail', [
                 };
 
                 if( $(element).find('.btm-act-icn').hasClass('btm-active')){
-                    /*var api = new  LHAPI({
-                        url : NOSHOUURL,
-                        data : {
-                            token : that.userId,
-                            APPChanel : "APP",
-                            id : that.param.id
-                        },
-                        method : 'post'
-                    });
 
-                    api.sendRequest()
-                        .done(function(data){
-                        
-                            if(data.code == 10000){
-                                $(element).find('.btm-act-icn').removeClass('btm-active');
-
-                                util.tip("已取消收藏！",1000);
-                            }
-                        })
-                        .fail(function(error){
-                            console.log("系统错误！");
-
-                        });*/
                     util.tip("您已收藏",2000);
                     return false;
                 }
 
                 else{
-
                     var api = new LHAPI({
                         url : SHOUURL,
                         data : {
@@ -754,7 +716,6 @@ define('lehu.h5.component.detail', [
                             }
                         })
                         .fail(function(error){
-
                             console.log("系统错误！");
                         });
                 }
@@ -777,24 +738,17 @@ define('lehu.h5.component.detail', [
                     api.sendRequest()
                         .done(function(data){
                             if(data.code == 2000){
-                                $('.btm-act-icn').addClass('btm-active');  
-
+                                $('.btm-act-icn').addClass('btm-active');
                             }
-
                         })
                         .fail(function(error){
-
                             console.log("系统错误！");
                         })
-
                 }
-           
-
             },
 
             //加入进货单
             '#nadd_cart click': function() {
-
                 var that = this;
                 var AMOUNT = $('.facations_shuliang').html();
                 //判断用户是否登录
@@ -836,6 +790,11 @@ define('lehu.h5.component.detail', [
                     return false;
                 }
 
+                if(parseInt($('.number_btn_cukun em').text()) < parseInt(that.MINBUYNUM)){
+                    util.tip("商品库存不足!",2000);
+                    return false;
+                }
+
                 var JHTURL = that.LURL + "cartAjax.ajax";
 
                 var api = new LHAPI({
@@ -857,11 +816,11 @@ define('lehu.h5.component.detail', [
                             util.tip(data.msg);
                         }
                         if(data.code == 2000){
-                            util.tip("已成功加入购物车!")
+                            util.tip("已成功加入进货单!")
                         }
                     })
                     .fail(function(error){
-                           util.tip("未能加入购物车!");
+                           util.tip("未能加入进货单!");
                     });
 
                 if( $('.gouwu').css("display") == "block"){
@@ -908,12 +867,18 @@ define('lehu.h5.component.detail', [
                         }
                     })
 
-                })
+                });
                 if (gghs != gg) {
 
                     util.tip("需勾选商品属性!",2000)
                     return false;
-                }
+                };
+
+                if(parseInt($('.number_btn_cukun em').text()) < parseInt(that.MINBUYNUM)){
+
+                    util.tip("商品库存不足,无法购买!",2000);
+                    return false;
+                };
 
                 var api = new LHAPI({
                     url: JHTURL,
